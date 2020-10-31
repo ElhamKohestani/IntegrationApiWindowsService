@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationApiSynchroniser", "IntegrationApiSynchroniser.csproj", "{236C56D8-363D-4527-BC5A-2DA0A833F4A6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{236C56D8-363D-4527-BC5A-2DA0A833F4A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{236C56D8-363D-4527-BC5A-2DA0A833F4A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{236C56D8-363D-4527-BC5A-2DA0A833F4A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{236C56D8-363D-4527-BC5A-2DA0A833F4A6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {465DC2EF-B2B5-47C6-BBCA-A6FC509EC6E1}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "IntegrationApiSynchroniser": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
