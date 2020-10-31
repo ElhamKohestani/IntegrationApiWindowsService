@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IntegrationApiSynchroniser.Infrastructure.Models;
+using IntegrationApiSynchroniser.Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -18,7 +20,9 @@ namespace IntegrationApiSynchroniser
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    services.AddScoped<ISyncService, SyncService>();
                     services.AddHostedService<Worker>();
+                    services.AddDbContext<WorkerContext>();
                 });
     }
 }
