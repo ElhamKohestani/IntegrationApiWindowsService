@@ -20,7 +20,9 @@ namespace IntegrationApiSynchroniser
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.AddScoped<ISyncService, SyncService>();
+                    services.AddSingleton<IApiClientServices, ApiClientServices>();
+                    services.AddSingleton<ISyncService, SyncService>();
+                    
                     services.AddHostedService<Worker>();
                     services.AddDbContext<WorkerContext>();
                 });
