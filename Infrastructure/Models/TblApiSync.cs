@@ -12,6 +12,7 @@ namespace IntegrationApiSynchroniser.Infrastructure.Models
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public bool SyncStatus { get; set; }
+        public string Details { get; set; }
         public int? TryCount { get; set; }
     }
 }

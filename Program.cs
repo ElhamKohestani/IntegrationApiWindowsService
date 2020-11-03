@@ -6,6 +6,7 @@ using IntegrationApiSynchroniser.Infrastructure.Models;
 using IntegrationApiSynchroniser.Infrastructure.Services;
 using IntegrationApiSynchroniser.Infrastructure.Services.ApiAccountService;
 using IntegrationApiSynchroniser.Infrastructure.Services.ApiClientService;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -23,12 +24,15 @@ namespace IntegrationApiSynchroniser
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Scoped services
-                    services.AddScoped<ISyncService, SyncService>();
+                    
+                    
                     services.AddDbContext<WorkerContext>();
 
                     // Singleton services
-                    services.AddSingleton(typeof(IApiClientServices<>), typeof(ApiClientServices<>));
+                    services.AddSingleton<IApiClientServices, ApiClientServices>();
                     services.AddSingleton<IApiAccountService, ApiAccountService>();
+                    services.AddSingleton<ISyncService, SyncService>();
+                    services.AddSingleton<IUpdateTokenService, UpdateTokenService>();
 
                     // Hosted background services
                     services.AddHostedService<Worker>();

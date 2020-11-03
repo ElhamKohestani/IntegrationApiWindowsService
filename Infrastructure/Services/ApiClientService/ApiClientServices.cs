@@ -11,7 +11,7 @@ using IntegrationApiSynchroniser.Infrastructure.Helpers;
 
 namespace IntegrationApiSynchroniser.Infrastructure.Services.ApiClientService
 {
-    public class ApiClientServices<T> : IApiClientServices<T> where T : class
+    public class ApiClientServices : IApiClientServices
     {
         protected HttpResponseMessage message;
         protected HttpClient webApiClient;
@@ -21,128 +21,46 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services.ApiClientService
             webApiClient = new HttpClient();
         }
 
-        public async Task<T> GetAsync(string url, string tokan, string Id)
+        public async Task<HttpResponseMessage> GetAsync(string Url, string tokan, string parameter)
         {
-            webApiClient = this.HeadersForAccessTokenGenerate(tokan);
-            string endPointUrl = string.Format("{0}/{1}", url, Id);
-            message = await webApiClient.GetAsync(endPointUrl);
-
-            if (message.StatusCode != HttpStatusCode.OK)
+            using (var client = this.HeadersForAccessTokenGenerate(tokan, Url))
             {
-                return null;
-            }
-
-            return message.Content.ReadAsAsync<T>().Result;
-        }
-
-        public async Task<IEnumerable<T>> GetAllAsync(string url, string tokan)
-        {
-            webApiClient = this.HeadersForAccessTokenGenerate(tokan);
-            message = await webApiClient.GetAsync(url);
-
-            if (message.StatusCode != HttpStatusCode.OK)
-            {
-                return null;
-            }
-            var retContent = message.Content.ReadAsStringAsync().Result;
-            List<T> ret = JsonConvert.DeserializeObject<List<T>>(retContent);
-
-            return ret;
-        }
-
-        public async Task<T> PostAsync(string url, string tokan, T objCreate)
-        {
-            webApiClient = this.HeadersForAccessTokenGenerate(tokan);
-            try
-            {
-                message = await webApiClient.PostAsJsonAsync<T>(url, objCreate);
-
-                if (message.IsSuccessStatusCode)
+                using (var request = new HttpRequestMessage(HttpMethod.Get, Url))
                 {
-                    T ret = message.Content.ReadAsAsync<T>().Result;
+                    var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(parameter);
+                    parameter = System.Convert.ToBase64String(plainTextBytes);
 
-                    return ret;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-
-            return null;
-        }
-        public async Task<HttpResponseMessage> PostBasicAsync(string Url, string tokan, T objCreate)
-        {
-            using (var client = this.HeadersForAccessTokenGenerate(tokan))
-            using (var request = new HttpRequestMessage(HttpMethod.Post, Url))
-            {
-                var json = JsonConvert.SerializeObject(objCreate);
-                using (var stringContent = new StringContent(json, Encoding.UTF8, "application/json"))
-                {
-                    request.Content = stringContent;
-
-    
+                    request.Headers.Add("acbr_token_auth", tokan);
+                    request.Headers.Add("queryParams", parameter);
                     using (var response = await client
-                        .SendAsync(request)
-                        .ConfigureAwait(false))
+                           .SendAsync(request)
+                           .ConfigureAwait(false))
                     {
 
-                        if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Created)
-                            return response;
-                        else
-                            throw new ResponseException() { StatusCode = response.StatusCode, ResponseMessage = "Request to ARD Failed" };
+                        return response.EnsureSuccessStatusCode();
                     }
                 }
             }
+
         }
 
-        public async Task<T> PutAsync(string url, string tokan, T objCreate)
+        public async Task PostAsync(string Url, string tokan, string parameter)
         {
-            webApiClient = this.HeadersForAccessTokenGenerate(tokan);
-
-            try
+            using (var client = this.HeadersForAccessTokenGenerate(tokan, Url))
+            using (var request = new HttpRequestMessage(HttpMethod.Post, Url))
             {
-                message = await webApiClient.PutAsJsonAsync<T>(url, objCreate);
-
-                if (message.IsSuccessStatusCode)
+                request.Headers.Add("acbr_token_auth", tokan);
+                request.Headers.Add("queryParams", parameter);
+                using (var response = await client
+                       .SendAsync(request)
+                       .ConfigureAwait(false))
                 {
-                    T ret = message.Content.ReadAsAsync<T>().Result;
-
-                    return ret;
+                    response.EnsureSuccessStatusCode();
                 }
             }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-
-            return null;
         }
 
-        public async Task<bool> DeleteAsync(string url, string tokan, string Id)
-        {
-            webApiClient = this.HeadersForAccessTokenGenerate(tokan);
-            string endPointUrl = string.Format("{0}/{1}", url, Id);
-
-            try
-            {
-                message = await webApiClient.DeleteAsync(endPointUrl);
-
-                if (message.StatusCode != HttpStatusCode.OK)
-                {
-                    return false;
-                }
-
-                return message.Content.ReadAsAsync<bool>().Result;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        protected HttpClient HeadersForAccessTokenGenerate(string tokan)
+        protected HttpClient HeadersForAccessTokenGenerate(string tokan, string url)
         {
             HttpClientHandler handler = new HttpClientHandler() { UseDefaultCredentials = false };
             MediaTypeWithQualityHeaderValue contentType = new MediaTypeWithQualityHeaderValue("application/json");
@@ -150,11 +68,11 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services.ApiClientService
 
             try
             {
-                client.BaseAddress = new Uri(ApiClientHelper.baseUrlArd);
+                client.BaseAddress = new Uri(url);
                 client.Timeout = new TimeSpan(0, 0, 120);
                 client.DefaultRequestHeaders.Accept.Clear();
                 client.DefaultRequestHeaders.Accept.Add(contentType);
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokan);
+                //client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokan);
             }
             catch (Exception ex)
             {

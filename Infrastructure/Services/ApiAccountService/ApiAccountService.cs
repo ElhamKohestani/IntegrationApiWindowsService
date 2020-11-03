@@ -7,7 +7,7 @@ using IntegrationApiSynchroniser.Infrastructure.Services.ApiClientService;
 
 namespace IntegrationApiSynchroniser.Infrastructure.Services.ApiAccountService
 {
-    public class ApiAccountService : ApiClientServices<UserLoginDto>, IApiAccountService
+    public class ApiAccountService : ApiClientServices, IApiAccountService
     {
         public UserLoginDto Authenticate(UserLoginDto model)
         {

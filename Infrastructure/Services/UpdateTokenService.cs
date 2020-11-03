@@ -4,6 +4,7 @@ using IntegrationApiSynchroniser.Infrastructure.Models;
 using IntegrationApiSynchroniser.Infrastructure.Services.ApiAccountService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,14 +25,15 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services
     public class UpdateTokenService : IUpdateTokenService
     {
         private IConfiguration _conf;
-        private WorkerContext _context;
         private IApiAccountService _ardAccountService;
+        private IServiceScopeFactory _serviceScopeFactory;
 
-        public UpdateTokenService(WorkerContext context, IApiAccountService apiAccountService, IConfiguration conf)
+        public UpdateTokenService(IServiceScopeFactory serviceScopeFactory, IApiAccountService apiAccountService, IConfiguration conf)
         {
             _conf = conf;
-            _context = context;
+            
             _ardAccountService = apiAccountService;
+            _serviceScopeFactory = serviceScopeFactory;
         }
         public async Task UpdateToken(CancellationToken cancellationToken)
         {
@@ -42,37 +44,47 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services
 
                 TimeSpan start_interval = new TimeSpan(_conf.GetValue<int>("ATU_INTERVAL_START_HOUR"), _conf.GetValue<int>("ATU_INTERVAL_START_MIN"), 0);
                 TimeSpan end_interval = new TimeSpan(_conf.GetValue<int>("ATU_INTERVAL_STOP_HOUR"), _conf.GetValue<int>("ATU_INTERVAL_STOP_MIN"), 0);
+                int REPEAT_INTERVAL = _conf.GetValue<int>("ATU_SERIVCE_REPEAT_INTERVAL");
 
-
-                if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday && DateTime.Now.TimeOfDay <= end_interval && DateTime.Now.TimeOfDay >= start_interval)
+                if (_conf.GetValue<bool>("ATU_SERVICE"))
                 {
-                    StakeholderApis stakeholderApis = new StakeholderApis();
-                    stakeholderApis = await _context.StakeholderApis.
-                        Where(a => a.StakeholderId ==(int)StakeholderIDs.ARD_ID)
-                        .SingleOrDefaultAsync();
-
-                    if (stakeholderApis != null && ((stakeholderApis.LastUpdateTime.Value.TimeOfDay > end_interval || stakeholderApis.LastUpdateTime.Value.TimeOfDay < start_interval) || stakeholderApis.LastUpdateTime == null))
+                    using (IServiceScope scope = _serviceScopeFactory.CreateScope())
                     {
-                        string UserName = stakeholderApis.UserName;
-                        string Password = EncryptionHelper.Decrypt(stakeholderApis.Password);
-
-                        UserLoginDto credentials = _ardAccountService.Authenticate(new UserLoginDto()
+                        WorkerContext _context = scope.ServiceProvider.GetRequiredService<WorkerContext>();
+                        if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday && DateTime.Now.TimeOfDay <= end_interval && DateTime.Now.TimeOfDay >= start_interval)
                         {
-                            Username = UserName,
-                            Password = Password
+                            StakeholderApis stakeholderApis = new StakeholderApis();
+                            stakeholderApis = await _context.StakeholderApis.
+                                Where(a => a.StakeholderId == (int)StakeholderIDs.ARD_ID)
+                                .SingleOrDefaultAsync();
 
-                        });
+                            if (stakeholderApis != null && ((stakeholderApis.LastUpdateTime.Value.TimeOfDay > end_interval || stakeholderApis.LastUpdateTime.Value.TimeOfDay < start_interval) || stakeholderApis.LastUpdateTime == null))
+                            {
+                                string UserName = stakeholderApis.UserName;
+                                string Password = EncryptionHelper.Decrypt(stakeholderApis.Password);
 
-                        if (!string.IsNullOrEmpty(credentials.Token))
-                        {
-                            stakeholderApis.Token = credentials.Token;
-                            stakeholderApis.LastUpdateTime = DateTime.Now;
-                            await _context.SaveChangesAsync();
+                                UserLoginDto credentials = _ardAccountService.Authenticate(new UserLoginDto()
+                                {
+                                    Username = UserName,
+                                    Password = Password
+
+                                });
+
+                                if (!string.IsNullOrEmpty(credentials.Token))
+                                {
+                                    stakeholderApis.Token = credentials.Token;
+                                    stakeholderApis.LastUpdateTime = DateTime.Now;
+                                    await _context.SaveChangesAsync();
+                                }
+                            }
                         }
+
+
                     }
                 }
 
-                await Task.Delay(_conf.GetValue<int>("ATU_SERIVCE_REPEAT_INTERVAL"), cancellationToken);
+               
+                await Task.Delay(REPEAT_INTERVAL, cancellationToken);
             }
         }
     }

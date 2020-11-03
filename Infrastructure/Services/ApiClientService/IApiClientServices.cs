@@ -4,18 +4,10 @@ using System.Threading.Tasks;
 
 namespace IntegrationApiSynchroniser.Infrastructure.Services.ApiClientService
 {
-    public interface IApiClientServices<T> where T : class
+    public interface IApiClientServices
     {
-        Task<T> GetAsync(string url, string tokan, string Id);
+        Task<HttpResponseMessage> GetAsync(string url, string tokan, string parameter);
+        Task PostAsync(string url, string tokan, string parameter);
 
-        Task<IEnumerable<T>> GetAllAsync(string url, string tokan);
-
-        Task<T> PostAsync(string url, string tokan, T objCreate);
-
-        Task<HttpResponseMessage> PostBasicAsync(string url, string tokan, T objCreate);
-
-        Task<T> PutAsync(string url, string tokan, T objCreate);
-
-        Task<bool> DeleteAsync(string url, string tokan, string Id);
     }
 }

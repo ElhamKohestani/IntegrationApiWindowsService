@@ -1,13 +1,19 @@
 ﻿using System;
+using IntegrationApiSynchroniser.Common;
+using IntegrationApiSynchroniser.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.Extensions.Configuration;
 
 namespace IntegrationApiSynchroniser.Infrastructure.Models
 {
     public partial class WorkerContext : DbContext
     {
+     
+
         public WorkerContext()
         {
+            
         }
 
         public WorkerContext(DbContextOptions<WorkerContext> options)
@@ -33,8 +39,8 @@ namespace IntegrationApiSynchroniser.Infrastructure.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=Localhost\\MSS19; Database=api_integration; User ID=sa; Password=kasperskyantigeral");
+                // TODO: change it to access from Setting static class in common namespace
+                optionsBuilder.UseSqlServer("Server=Localhost\\MSS19; Database=api_integration; User ID=sa; Password=123");
             }
         }
 
