@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using IntegrationApiSynchroniser.Infrastructure.Models;
 using IntegrationApiSynchroniser.Infrastructure.Services;
+using IntegrationApiSynchroniser.Infrastructure.Services.ApiAccountService;
+using IntegrationApiSynchroniser.Infrastructure.Services.ApiClientService;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -20,9 +22,16 @@ namespace IntegrationApiSynchroniser
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    // Scoped services
                     services.AddScoped<ISyncService, SyncService>();
-                    services.AddHostedService<Worker>();
                     services.AddDbContext<WorkerContext>();
+
+                    // Singleton services
+                    services.AddSingleton(typeof(IApiClientServices<>), typeof(ApiClientServices<>));
+                    services.AddSingleton<IApiAccountService, ApiAccountService>();
+
+                    // Hosted background services
+                    services.AddHostedService<Worker>();
                 });
     }
 }

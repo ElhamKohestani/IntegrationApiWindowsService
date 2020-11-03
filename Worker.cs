@@ -30,7 +30,7 @@ namespace IntegrationApiSynchroniser
             using (var scope = _servicProvider.CreateScope())
             {
                 ISyncService syncService = _servicProvider.GetRequiredService<ISyncService>();
-                await syncService.Sync();
+                await syncService.Sync(stoppingToken);
             }
             //while (!stoppingToken.IsCancellationRequested)
             //{
