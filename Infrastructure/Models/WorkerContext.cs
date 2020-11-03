@@ -39,8 +39,8 @@ namespace IntegrationApiSynchroniser.Infrastructure.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                // TODO: change it to access from Setting static class in common namespace
-                optionsBuilder.UseSqlServer("Server=Localhost\\MSS19; Database=api_integration; User ID=sa; Password=123");
+                // TODO: enter your database credentials
+                optionsBuilder.UseSqlServer("Server=DESKTOP-HMHP6M4\\MSS19; Database=api_integration; User ID=sa; Password=");
             }
         }
 

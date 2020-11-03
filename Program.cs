@@ -24,8 +24,6 @@ namespace IntegrationApiSynchroniser
                 .ConfigureServices((hostContext, services) =>
                 {
                     // Scoped services
-                    
-                    
                     services.AddDbContext<WorkerContext>();
 
                     // Singleton services
@@ -36,6 +34,7 @@ namespace IntegrationApiSynchroniser
 
                     // Hosted background services
                     services.AddHostedService<Worker>();
+                    services.AddHostedService<WorkerToken>();
                 });
     }
 }

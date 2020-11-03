@@ -8,12 +8,12 @@ namespace IntegrationApiSynchroniser
     public class Worker : BackgroundService
     {
         private ISyncService _synService;
-        private IUpdateTokenService _tokenUpdateService;
+        //private IUpdateTokenService _tokenUpdateService;
 
-        public Worker(ISyncService syncService, IUpdateTokenService tokenUpdateService)
+        public Worker(ISyncService syncService)
         {
             _synService = syncService;
-            _tokenUpdateService = tokenUpdateService;
+            //_tokenUpdateService = tokenUpdateService;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -21,9 +21,6 @@ namespace IntegrationApiSynchroniser
             
             // Task retry failed records
             await _synService.Sync(stoppingToken);
-
-            //Task update token 
-            await _tokenUpdateService.UpdateToken(stoppingToken);
 
         }
     }
