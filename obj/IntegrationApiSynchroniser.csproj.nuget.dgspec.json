@@ -1,20 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\MODDEVELOPER\\Desktop\\Collaborated Projects\\IntegrationApiWindowsService\\IntegrationApiSynchroniser.csproj": {}
+    "C:\\Users\\user\\Desktop\\Collborated Projects\\IntegrationApiWindowsService\\IntegrationApiSynchroniser.csproj": {}
   },
   "projects": {
-    "C:\\Users\\MODDEVELOPER\\Desktop\\Collaborated Projects\\IntegrationApiWindowsService\\IntegrationApiSynchroniser.csproj": {
+    "C:\\Users\\user\\Desktop\\Collborated Projects\\IntegrationApiWindowsService\\IntegrationApiSynchroniser.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\MODDEVELOPER\\Desktop\\Collaborated Projects\\IntegrationApiWindowsService\\IntegrationApiSynchroniser.csproj",
+        "projectUniqueName": "C:\\Users\\user\\Desktop\\Collborated Projects\\IntegrationApiWindowsService\\IntegrationApiSynchroniser.csproj",
         "projectName": "IntegrationApiSynchroniser",
-        "projectPath": "C:\\Users\\MODDEVELOPER\\Desktop\\Collaborated Projects\\IntegrationApiWindowsService\\IntegrationApiSynchroniser.csproj",
-        "packagesPath": "C:\\Users\\MODDEVELOPER\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\MODDEVELOPER\\Desktop\\Collaborated Projects\\IntegrationApiWindowsService\\obj\\",
+        "projectPath": "C:\\Users\\user\\Desktop\\Collborated Projects\\IntegrationApiWindowsService\\IntegrationApiSynchroniser.csproj",
+        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\user\\Desktop\\Collborated Projects\\IntegrationApiWindowsService\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\MODDEVELOPER\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -82,7 +85,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
         }
       }
     }

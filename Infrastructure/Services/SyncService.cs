@@ -22,7 +22,7 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services
 
         public SyncService(IConfiguration conf, IServiceScopeFactory serviceScopeFactory, IApiClientServices clientServices)
         {
-            
+
             _serviceScopeFactory = serviceScopeFactory;
             _conf = conf;
             _apiClientServices = clientServices;
@@ -35,24 +35,30 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services
                 string BASE_URL = _conf.GetValue<string>("API_BASE_URL");
                 string AUTH_TOKEN = _conf.GetValue<string>("AUTH_TOKEN");
                 HttpResponseMessage httpResponseMessage = new HttpResponseMessage();
+                int syncIdInCurrentLoop = 0;
 
                 if (_conf.GetValue<bool>("ARS_SERVICE"))
                 {
+
+                    var scope = _serviceScopeFactory.CreateScope();
+
                     try
                     {
-                        using (var scope = _serviceScopeFactory.CreateScope())
+                        WorkerContext context = scope.ServiceProvider.GetRequiredService<WorkerContext>();
+
+
+                        List<TblApiSync> failedRecords = await context.TblApiSync.Where(a => a.SyncStatus == false && a.TryCount <= 4).ToListAsync();
+                        if (failedRecords.Any())
                         {
-                            WorkerContext context = scope.ServiceProvider.GetRequiredService<WorkerContext>();
-                            List<TblApiSync> failedRecords = await context.TblApiSync.Where(a => a.SyncStatus == false && a.TryCount <= 4).ToListAsync();
-                            if (failedRecords.Any())
+                            failedRecords.ForEach(async s =>
                             {
-                                failedRecords.ForEach(async s =>
+                                syncIdInCurrentLoop = s.ApiSynId;
+                                TblApiSync toUpdateRecord = await context.TblApiSync.Where(r => r.ApiSynId == s.ApiSynId).SingleOrDefaultAsync();
+
+                                try
                                 {
-                                    httpResponseMessage =  await _apiClientServices.GetAsync(new StringBuilder(BASE_URL).Append(s.EndPoint).ToString(),
-                                         AUTH_TOKEN, s.Parameter);
-
-
-                                    TblApiSync toUpdateRecord = await context.TblApiSync.Where(r => r.ApiSynId == s.ApiSynId).SingleOrDefaultAsync();
+                                    httpResponseMessage = await _apiClientServices.GetAsync(new StringBuilder(BASE_URL).Append(s.EndPoint).ToString(),
+                                   AUTH_TOKEN, s.Parameter);
 
                                     if (httpResponseMessage.StatusCode == HttpStatusCode.OK || httpResponseMessage.StatusCode == HttpStatusCode.Created)
                                     {
@@ -64,19 +70,21 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services
                                     }
 
                                     await context.SaveChangesAsync();
+                                }
+                                catch(Exception ex)
+                                {
+                                    toUpdateRecord.SyncStatus = false;
+                                    toUpdateRecord.TryCount = toUpdateRecord.TryCount + 1;
+                                    await context.SaveChangesAsync();
+                                }
+                            });
 
-
-                                });
-                            }
                         }
                     }
                     catch (Exception ex)
                     {
-
                     }
                 }
-                
-                
                 // The sync operation will repeat after recieving value of settings.
                 await Task.Delay(REPEAT_INTERVAL, stoppingToken);
             }

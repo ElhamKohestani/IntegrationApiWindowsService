@@ -27,8 +27,8 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services.ApiClientService
             {
                 using (var request = new HttpRequestMessage(HttpMethod.Get, Url))
                 {
-                    var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(parameter);
-                    parameter = System.Convert.ToBase64String(plainTextBytes);
+                    //var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(parameter);
+                    //parameter = System.Convert.ToBase64String(plainTextBytes);
 
                     request.Headers.Add("acbr_token_auth", tokan);
                     request.Headers.Add("queryParams", parameter);
@@ -37,7 +37,7 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services.ApiClientService
                            .ConfigureAwait(false))
                     {
 
-                        return response.EnsureSuccessStatusCode();
+                        return response;
                     }
                 }
             }

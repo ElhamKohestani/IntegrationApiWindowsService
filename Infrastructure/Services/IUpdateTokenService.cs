@@ -8,6 +8,6 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services
 {
     public interface IUpdateTokenService
     {
-        Task UpdateToken(CancellationToken cancellationToken);
+        Task<int> UpdateToken(CancellationToken cancellationToken);
     }
 }

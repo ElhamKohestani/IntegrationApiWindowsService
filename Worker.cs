@@ -8,12 +8,10 @@ namespace IntegrationApiSynchroniser
     public class Worker : BackgroundService
     {
         private ISyncService _synService;
-        //private IUpdateTokenService _tokenUpdateService;
 
         public Worker(ISyncService syncService)
         {
             _synService = syncService;
-            //_tokenUpdateService = tokenUpdateService;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

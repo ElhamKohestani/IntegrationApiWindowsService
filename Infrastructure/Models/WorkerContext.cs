@@ -35,14 +35,14 @@ namespace IntegrationApiSynchroniser.Infrastructure.Models
         public virtual DbSet<UserTokens> UserTokens { get; set; }
         public virtual DbSet<Users> Users { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                // TODO: enter your database credentials
-                optionsBuilder.UseSqlServer("Server=DESKTOP-HMHP6M4\\MSS19; Database=api_integration; User ID=sa; Password=");
-            }
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    if (!optionsBuilder.IsConfigured)
+        //    {
+        //        // TODO: enter your database credentials
+        //        optionsBuilder.UseSqlServer("Server=DESKTOP-HMHP6M4\\MSS19; Database=api_integration; User ID=sa; Password=");
+        //    }
+        //}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -115,13 +115,9 @@ namespace IntegrationApiSynchroniser.Infrastructure.Models
 
             modelBuilder.Entity<StakeholderApis>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("StakeholderAPIs");
 
-                entity.Property(e => e.Id)
-                    .HasColumnName("ID")
-                    .ValueGeneratedOnAdd();
+                entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.Password)
                     .IsRequired()

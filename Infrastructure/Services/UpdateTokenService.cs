@@ -35,7 +35,7 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services
             _ardAccountService = apiAccountService;
             _serviceScopeFactory = serviceScopeFactory;
         }
-        public async Task UpdateToken(CancellationToken cancellationToken)
+        public async Task<int> UpdateToken(CancellationToken cancellationToken)
         {
             
 
@@ -48,44 +48,63 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services
 
                 if (_conf.GetValue<bool>("ATU_SERVICE"))
                 {
-                    using (IServiceScope scope = _serviceScopeFactory.CreateScope())
+                    try
                     {
-                        WorkerContext _context = scope.ServiceProvider.GetRequiredService<WorkerContext>();
-                        if (DateTime.Now.DayOfWeek == DayOfWeek.Saturday && DateTime.Now.TimeOfDay <= end_interval && DateTime.Now.TimeOfDay >= start_interval)
+                        using (IServiceScope scope = _serviceScopeFactory.CreateScope())
                         {
-                            StakeholderApis stakeholderApis = new StakeholderApis();
-                            stakeholderApis = await _context.StakeholderApis.
-                                Where(a => a.StakeholderId == (int)StakeholderIDs.ARD_ID)
-                                .SingleOrDefaultAsync();
-
-                            if (stakeholderApis != null && ((stakeholderApis.LastUpdateTime.Value.TimeOfDay > end_interval || stakeholderApis.LastUpdateTime.Value.TimeOfDay < start_interval) || stakeholderApis.LastUpdateTime == null))
+                            WorkerContext _context = scope.ServiceProvider.GetRequiredService<WorkerContext>();
+                            if (DateTime.Now.DayOfWeek == DayOfWeek.Thursday && DateTime.Now.TimeOfDay <= end_interval && DateTime.Now.TimeOfDay >= start_interval)
                             {
-                                string UserName = stakeholderApis.UserName;
-                                string Password = EncryptionHelper.Decrypt(stakeholderApis.Password);
+                                StakeholderApis stakeholderApis = await _context.StakeholderApis.
+                                    Where(a => a.StakeholderId == (int)StakeholderIDs.ARD_ID)
+                                    .SingleOrDefaultAsync();
 
-                                UserLoginDto credentials = _ardAccountService.Authenticate(new UserLoginDto()
+                                if (stakeholderApis != null && ((stakeholderApis.LastUpdateTime.Value.TimeOfDay > end_interval || stakeholderApis.LastUpdateTime.Value.TimeOfDay < start_interval) || stakeholderApis.LastUpdateTime == null))
                                 {
-                                    Username = UserName,
-                                    Password = Password
+                                    string UserName = stakeholderApis.UserName;
+                                    string Password = EncryptionHelper.Decrypt(stakeholderApis.Password);
 
-                                });
+                                    // Uncomment
+                                    UserLoginDto credentials = _ardAccountService.Authenticate(new UserLoginDto()
+                                    {
+                                        Username = UserName,
+                                        Password = Password
 
-                                if (!string.IsNullOrEmpty(credentials.Token))
-                                {
-                                    stakeholderApis.Token = credentials.Token;
-                                    stakeholderApis.LastUpdateTime = DateTime.Now;
-                                    await _context.SaveChangesAsync();
+                                    });
+
+
+                                    //Delete
+                                    //UserLoginDto credentials = new UserLoginDto()
+                                    //{
+
+                                    //    Username = "x",
+                                    //    Password = "ddd",
+                                    //    Token = "Test"
+                                    //};
+
+
+                                    if (!string.IsNullOrEmpty(credentials.Token))
+                                    {
+                                        stakeholderApis.Token = credentials.Token;
+                                        stakeholderApis.LastUpdateTime = DateTime.Now;
+
+
+                                        await _context.SaveChangesAsync();
+                                    }
                                 }
                             }
                         }
-
+                    }
+          
+                    catch(Exception ex)
+                    {
 
                     }
                 }
-
-               
                 await Task.Delay(REPEAT_INTERVAL, cancellationToken);
             }
+
+            return 0;
         }
     }
 }

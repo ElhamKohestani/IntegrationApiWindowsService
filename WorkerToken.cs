@@ -11,9 +11,8 @@ namespace IntegrationApiSynchroniser
       
         private IUpdateTokenService _tokenUpdateService;
 
-        public WorkerToken(/*ISyncService syncService, */IUpdateTokenService tokenUpdateService)
+        public WorkerToken(IUpdateTokenService tokenUpdateService)
         {
-            //_synService = syncService;
             _tokenUpdateService = tokenUpdateService;
         }
 

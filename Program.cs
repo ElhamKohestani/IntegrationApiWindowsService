@@ -7,6 +7,7 @@ using IntegrationApiSynchroniser.Infrastructure.Services;
 using IntegrationApiSynchroniser.Infrastructure.Services.ApiAccountService;
 using IntegrationApiSynchroniser.Infrastructure.Services.ApiClientService;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -23,8 +24,10 @@ namespace IntegrationApiSynchroniser
             Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
+                    IConfiguration configuration = hostContext.Configuration;
+
                     // Scoped services
-                    services.AddDbContext<WorkerContext>();
+                    services.AddDbContext<WorkerContext>(option =>  option.UseSqlServer(configuration.GetValue<string>("ConnectionStringToApi")) );
 
                     // Singleton services
                     services.AddSingleton<IApiClientServices, ApiClientServices>();

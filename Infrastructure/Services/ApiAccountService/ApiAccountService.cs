@@ -25,6 +25,7 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services.ApiAccountService
             {
                 BaseAddress = new Uri(_configuration.GetValue<string>("ARD_BASE_URL"))
             };
+            client.Timeout = TimeSpan.FromMinutes(1);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(contentType);
 
