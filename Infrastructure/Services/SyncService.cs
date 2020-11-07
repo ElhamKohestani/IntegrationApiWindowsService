@@ -67,6 +67,7 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services
                                     else
                                     {
                                         toUpdateRecord.TryCount = s.TryCount + 1;
+                                        toUpdateRecord.UpdatedDate = DateTime.Now;
                                     }
 
                                     await context.SaveChangesAsync();
@@ -75,6 +76,7 @@ namespace IntegrationApiSynchroniser.Infrastructure.Services
                                 {
                                     toUpdateRecord.SyncStatus = false;
                                     toUpdateRecord.TryCount = toUpdateRecord.TryCount + 1;
+                                    toUpdateRecord.UpdatedDate = DateTime.Now;
                                     await context.SaveChangesAsync();
                                 }
                             });
